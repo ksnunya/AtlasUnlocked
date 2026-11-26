@@ -1,10 +1,10 @@
 # Media credits
 
-The [draft local-use license](LICENSE) covers the proposed local use of the application. Video ownership and third-party terms are listed below.
+The [local-use license](LICENSE) covers the permitted local use of the application. Video ownership and third-party terms are listed below.
 
 ## Original mission clips
 
-Copyright © Kela Small. All rights reserved in her original video material. The proposed application license would allow viewing these clips within the locally running game. Separate reuse or redistribution requires Kela Small’s explicit permission. The original files are included in the private development repository and source archive. A sampled-frame review and stream inspection found the following items to confirm before publication.
+Copyright © Kela Small. All rights reserved in her original video material. The application license allows viewing these clips within the locally running game. Separate reuse or redistribution requires Kela Small’s explicit permission. The original files are included in the private development repository and source archive. A sampled-frame review and stream inspection found the following items to confirm before publication.
 
 | Clip | Publication review |
 | --- | --- |
