@@ -84,17 +84,3 @@ export const initialInventory: InventoryItem[] = [
   { id: "battery", name: "Charge cells", quantity: "4", category: "In-Game", packed: true, available: true, optional: true, icon: "battery" },
   { id: "relay", name: "Signal relay", quantity: "1", category: "In-Game", packed: false, available: false, optional: false, icon: "relay" },
 ];
-
-const note = (id: string, category: NoteCategory, text: string, missionId?: string): FieldNote => ({ id, category, text, missionId, createdAt: Date.now() - (11 - Number(id.replace("note-", ""))) * 86_400_000, important: false });
-export const initialNotes: FieldNote[] = [
-  note("note-1", "Clues", "Relay tower northeast of river.", "northwind"),
-  note("note-2", "Clues", "Storm damaged backup antenna.", "northwind"),
-  note("note-3", "Numbers", "Generator output: 12 volts.", "northwind"),
-  note("note-4", "Numbers", "Relay bearing: 038°.", "northwind"),
-  note("note-5", "Places", "Northwind Field Research Station.", "northwind"),
-  note("note-6", "Places", "Old weather lookout."),
-  note("note-7", "Vocabulary", "Relay — sends a signal onward.", "northwind"),
-  note("note-8", "Vocabulary", "Bearing — direction from a fixed point."),
-  note("note-9", "To Do", "Find the damaged relay.", "northwind"),
-  note("note-10", "To Do", "Check water before departure.", "northwind"),
-];

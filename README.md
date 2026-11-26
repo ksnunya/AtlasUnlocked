@@ -6,6 +6,8 @@ Atlas Unlocked is a browser-based expedition game about route planning, field ob
 
 ## Development status
 
+Version **0.1.0** is an early development release candidate.
+
 Atlas Unlocked is a playable work in progress and has not been fully tested. Future development includes character selection, mission improvements, and additional gameplay testing.
 
 ## Development and Technology
@@ -37,6 +39,17 @@ powershell -File .\src\windows\AtlasUnlockedLauncher.ps1 -Action Shortcut
 
 The Shortcut action creates an Atlas Unlocked desktop shortcut for this checkout. The Windows launcher opens the game in the installed Google Chrome using its normal profile. Keep using the same browser profile and `http://localhost:8080` to continue a save from before the rename. The game still reads and writes the original browser storage key.
 
+### Windows shortcut limitation
+
+On some Windows setups, the shortcut can trigger a Chrome application error (0x80000003). The manual launch path uses the same game address and Chrome profile. Build the game, then start the loopback server from the project folder and leave the terminal open:
+
+```powershell
+npm.cmd run build
+node .\src\windows\AtlasUnlockedServer.mjs
+```
+
+If Atlas Unlocked already responds at port 8080, use the running server. In an existing Chrome window, enter **http://localhost:8080**. This avoids the shortcut's browser launch step. If Vite's default config loader cannot start its subprocess in a restricted Windows session, run `npm run build -- --configLoader native` with the supported Node 24 release.
+
 ## Play the campaign
 
 | Mission | Field work |
@@ -48,6 +61,10 @@ The Shortcut action creates an Atlas Unlocked desktop shortcut for this checkout
 | 06 Echo Canyon Survey | Pick a stable route, calculate the surveyed area, and record the route. |
 
 Northwind includes a text-based question about offering help followed by two ASL videos. For the text question, use the mouse or Tab to the choices, arrow keys to move between them, and Enter to submit the selected answer. The round keeps its original save identifier so earlier completions still count.
+
+A new player starts at Base Camp with an empty Notebook and the default supplies. The Parent Dashboard shows saved expedition activity and self-reported Academy Work. The game does not track playtime or report grades, achievements, or subject mastery.
+
+When connected, the expedition map shows live OpenStreetMap tiles with visible attribution. The original illustrated terrain remains available offline. The project does not bundle tiles. See [OpenStreetMap attribution](https://www.openstreetmap.org/copyright) and the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/).
 
 ## Mission videos
 
@@ -75,7 +92,9 @@ The DOM tests exercise the campaign through player controls. After building with
 
 ### Outstanding testing
 
-A clean install through the supported Node 24 setup, a full manual campaign playthrough, keyboard and mouse behavior, save and reload across browsers, Windows shortcut behavior, and playback of all three mission videos still need end-to-end verification. Existing lint errors in two UI type declarations and the Tailwind configuration remain open. The Windows verification environment can block Node subprocesses used by npm install hooks, test isolation, and the production-server test.
+Clean installation on Node 24, a full manual browser playthrough, cross-browser save and reload behavior, desktop shortcut launch, and in-browser playback of all three clips remain release checks. Type checking and lint pass in the available environment, with existing Fast Refresh warnings. A Windows restriction can block the default Vite config loader, npm install hooks, and subprocess-based test runners.
+
+The npm advisory service was unreachable during release verification. The locked Vite development server should remain loopback-only, as configured. Upstream identifies a patch for [GHSA-p4f5-76q4-ffq7](https://github.com/vitejs/vite/security/advisories/GHSA-p4f5-76q4-ffq7), which applies when affected development servers are exposed to the network.
 
 ## Licensing
 
@@ -83,11 +102,14 @@ Copyright © 2026 Kela Small. The [local-use license](LICENSE) permits free down
 
 Kela Small’s three original video assets are separately copyrighted, with all rights reserved. Broader reuse requires her explicit permission. See [media credits](MEDIA-CREDITS.md) for asset details.
 
+Third-party software notices are included in the [source](THIRD-PARTY-NOTICES.txt) and generated production build.
+
 ## Release checklist
 
-- [ ] Install locked dependencies through an approved registry connection or a trusted offline cache. Run typecheck, tests, lint, and the production build.
-- [ ] Confirm signer consent and review the third-party graphics in the three owner-created clips before any public release.
-- [ ] Launch locally and complete all five missions. Verify keyboard and mouse controls, playback for all three clips, saved progress across reloads, and browser compatibility.
-- [ ] Capture the expedition map and Northwind encounter from the verified local build.
-- [x] Obtain Kela Small’s approval of the license.
-- [ ] Obtain publication approval after media rights and repository security review.
+- [x] Adopt the owner-approved local-use license and document development credits.
+- [x] Record shipped software notices and map attribution.
+- [ ] Complete an online dependency audit and verify the Vite patch on Node 24.
+- [ ] Confirm signer consent and clear embedded graphics for public GitHub and portfolio distribution.
+- [ ] Verify all five missions and the three videos in a supported browser from a clean checkout.
+- [ ] Capture approved promotional screenshots from a fresh browser profile.
+- [ ] Obtain publication approval after the security and media rights checks are cleared.

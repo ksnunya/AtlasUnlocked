@@ -46,7 +46,7 @@ learning-updates-hashes.json
 .npm-cache/
 
 # Private local assets
-/public/kalea-small.png
+/public/*.png
 desktop.ini
 Thumbs.db
 

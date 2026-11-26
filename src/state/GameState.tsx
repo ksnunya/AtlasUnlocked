@@ -8,7 +8,7 @@ import { completeMission, completionBlocker, loadCampaign, selectCampaignMission
 interface SavedGame extends CampaignState { schemaVersion?: number; missionRun?: MissionRunState; activeNoteTab?: NoteCategory; tutorialCompleted?: boolean }
 interface NewInventoryItem { name: string; quantity: string; physicalCategory: PhysicalCategory }
 interface GameStateValue {
-  missions: Mission[]; selectedMission: Mission; inventory: InventoryItem[]; notes: FieldNote[]; activeView: ViewName; overlay: OverlayName; notice: string | null; activeNoteTab: NoteCategory; missionRun: MissionRunState; tutorialCompleted: boolean;
+  missions: Mission[]; selectedMission: Mission; inventory: InventoryItem[]; notes: FieldNote[]; activeView: ViewName; overlay: OverlayName; notice: string | null; activeNoteTab: NoteCategory; missionRun: MissionRunState; missionRuns: CampaignState["missionRuns"]; tutorialCompleted: boolean;
   setActiveView: (view: ViewName) => void; setOverlay: (overlay: OverlayName) => void; selectMission: (id: string) => void; togglePacked: (id: string) => void; updateInventoryItem: (id: string, patch: Partial<InventoryItem>) => void; addInventoryItem: (item: NewInventoryItem) => void; deleteInventoryItem: (id: string) => void;
   addNote: (category: NoteCategory, text: string) => void; editNote: (id: string, text: string) => void; deleteNote: (id: string) => void; moveNote: (id: string, category: NoteCategory) => void; toggleImportantNote: (id: string) => void; setActiveNoteTab: (tab: NoteCategory) => void;
   startMission: (missionId?: string) => void; closeMission: () => void; setMissionStage: (stage: MissionStage) => void; updateMissionRun: (patch: Partial<MissionRunState>) => void; recordAttempt: (taskId: string, answer: string, correct: boolean) => void; toggleAcademyWork: (id: string) => void; finishVerticalSlice: () => void; finishSelectedMission: () => void;
@@ -123,7 +123,7 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     setNotice("Experiment complete. The observation is saved in the shared Notebook.");
   };
   const value: GameStateValue = {
-    missions, selectedMission, inventory, notes, activeView, overlay, notice, activeNoteTab, missionRun, tutorialCompleted, lab, completionReady: completionReason === null, completionReason,
+    missions, selectedMission, inventory, notes, activeView, overlay, notice, activeNoteTab, missionRun, missionRuns: game.missionRuns, tutorialCompleted, lab, completionReady: completionReason === null, completionReason,
     setActiveView, setOverlay, selectMission, startMission, closeMission, setMissionStage, recordAttempt, completeObjective, prepareRelay, runLabExperiment,
     updateMissionRun: (patch) => setMissionRun((run) => ({ ...run, ...patch })),
     toggleAcademyWork: (id) => setMissionRun((run) => ({ ...run, academyWork: { ...run.academyWork, [id]: !run.academyWork[id] } })),

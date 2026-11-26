@@ -12,7 +12,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createRoot } = require('react-dom/client');
 const { GameStateProvider, useGameState } = require('../state/GameState.tsx');
 const { ExpeditionApp } = require('../pages/Index.tsx');
-const { initialMissions, initialInventory, initialNotes } = require('../data/gameData.ts');
+const { initialMissions, initialInventory } = require('../data/gameData.ts');
 const { initialMissionRun } = require('../data/missionContent.ts');
 const KEY = 'world-prep-academy-phase3';
 let state, root;
@@ -183,6 +183,44 @@ async function northwind() {
   assert.equal(state.missionRun.stage, 'summary');
 }
 
+await test('First launch has an empty notebook and zero earned parent dashboard activity', async () => {
+  await mount(null);
+  assert.equal(state.selectedMission.id, 'base-camp');
+  assert.equal(state.tutorialCompleted, false);
+  assert.deepEqual(state.missions.map(m => m.state), ['available', 'locked', 'locked', 'locked', 'locked']);
+  assert.deepEqual(state.notes, []);
+  assert.deepEqual(state.inventory, initialInventory);
+  await click('Skip');
+  await click([...document.querySelectorAll('footer button')].find(b => b.querySelector('span')?.textContent === 'Parent Dashboard'));
+  const dialog = document.querySelector('[role="dialog"]');
+  for (const [label, value] of [
+    ['Current mission', 'Establish Base Camp'], ['Mission progress', '0%'],
+    ['Missions completed', '0 / 5'], ['Notebook activity', '0 notes'],
+    ['Attempts recorded', '0'], ['Academy Work checked', '0 / 5'],
+    ['Supplies status', '2 / 3 packed'],
+  ]) {
+    const field = [...dialog.querySelectorAll('p')].find(p => p.textContent === label);
+    assert.equal(field.nextElementSibling.textContent, value, label);
+  }
+  await click('Close panel');
+  await click('Notebook');
+  assert.match(document.body.textContent, /No notes in this section yet/);
+  await reload();
+  assert.deepEqual(state.notes, []);
+  assert.equal(state.tutorialCompleted, true);
+});
+
+await test('Migrating old notebook examples preserves edited and player-created observations', async () => {
+  await mount({ tutorialCompleted: true, notes: [
+    { id: 'note-1', category: 'Clues', text: 'Relay tower northeast of river.', missionId: 'northwind', createdAt: 1, important: false },
+    { id: 'note-2', category: 'Clues', text: 'My revised observation.', missionId: 'northwind', createdAt: 2, important: false },
+    { id: 'note-100-200', category: 'Clues', text: 'Relay tower northeast of river.', missionId: 'northwind', createdAt: 3, important: false },
+  ] });
+  assert.deepEqual(state.notes.map(note => note.id), ['note-2', 'note-100-200']);
+  await reload();
+  assert.deepEqual(state.notes.map(note => note.id), ['note-2', 'note-100-200']);
+});
+
 await test('Entire fresh campaign: all five missions completed solely through player controls', async () => {
   await mount(null); await click('Skip'); assert.equal(state.selectedMission.id, 'base-camp'); assert.equal(state.missions.filter((m) => m.state === 'completed').length, 0);
   assert.deepEqual(state.missions.map((m) => m.number), ['01', '02', '04', '05', '06']);
@@ -215,7 +253,7 @@ await test('Entire fresh campaign: all five missions completed solely through pl
 });
 
 function legacySave() {
-  return structuredClone({ missions: initialMissions.map((m) => ['base-camp', 'cedar-pass'].includes(m.id) ? { ...m, state: 'completed', progress: 100, objectives: m.objectives.map((o) => ({ ...o, complete: true })) } : m.id === 'northwind' ? { ...m, state: 'active', progress: 55 } : m), selectedMissionId: 'northwind', inventory: initialInventory, notes: initialNotes, missionRun: { ...initialMissionRun, stage: 'cache', open: false, answers: { area: '12' }, completedTasks: ['reading-direction', 'reading-hazard', 'trail-note', 'asl', 'area'], noteBaseline: initialNotes.length }, tutorialCompleted: true });
+  return structuredClone({ missions: initialMissions.map((m) => ['base-camp', 'cedar-pass'].includes(m.id) ? { ...m, state: 'completed', progress: 100, objectives: m.objectives.map((o) => ({ ...o, complete: true })) } : m.id === 'northwind' ? { ...m, state: 'active', progress: 55 } : m), selectedMissionId: 'northwind', inventory: initialInventory, notes: [], missionRun: { ...initialMissionRun, stage: 'cache', open: false, answers: { area: '12' }, completedTasks: ['reading-direction', 'reading-hazard', 'trail-note', 'asl', 'area'], noteBaseline: 0 }, tutorialCompleted: true });
 }
 await test('Legacy single Northwind save migrates without losing achievements, notes, custom inventory or unfinished tasks', async () => {
   const save = legacySave(); save.inventory.push({ ...initialInventory[0], id: 'custom-old', custom: true, name: 'Old supply' }); save.notes.push({ id: 'old-note', category: 'Clues', text: 'Keep this note.' });
@@ -261,7 +299,7 @@ await test('Readiness check and progress/profile/parent buttons display real sav
 if (root) await act(async () => root.unmount());
 
 await test("Real installed failure: stale map labels and misassigned Base Camp evidence migrate without resetting progress",async()=>{
- const save={settings:{keep:'player preference'},learningRecords:[{id:'earned-record'}],schemaVersion:2,tutorialCompleted:true,selectedMissionId:'base-camp',missions:structuredClone(initialMissions),missionRuns:{northwind:{...initialMissionRun,completedTasks:['base-camp-site','base-camp-supplies'],answers:{'base-camp-site':'level-ground, high-ground'},attempts:{'base-camp-site':2}}},inventory:initialInventory,notes:[...initialNotes,{id:'player-note',category:'Clues',text:'Keep my observation.'}]};
+ const save={settings:{keep:'player preference'},learningRecords:[{id:'earned-record'}],schemaVersion:2,tutorialCompleted:true,selectedMissionId:'base-camp',missions:structuredClone(initialMissions),missionRuns:{northwind:{...initialMissionRun,completedTasks:['base-camp-site','base-camp-supplies'],answers:{'base-camp-site':'level-ground, high-ground'},attempts:{'base-camp-site':2}}},inventory:initialInventory,notes:[{id:'player-note',category:'Clues',text:'Keep my observation.'}]};
  save.missions[0].nodeCode='Sample route';save.missions[1].state='available';save.missions[1].nodeCode='Sample route';save.missions[2].state='active';save.missions[2].nodeCode='Active mission';
  await mount(save);assert.equal(state.selectedMission.id,'base-camp');assert.equal(state.selectedMission.state,'active');assert.equal(state.selectedMission.objectives[0].complete,true);assert.equal(state.selectedMission.objectives[1].complete,false,'Supplies exercise does not waive area calculation');assert.equal(state.missions[1].state,'locked');assert.equal(state.missions[2].state,'locked');assert.ok(state.missionRun.completedTasks.includes('base-camp-supplies'));assert.equal(state.missionRun.attempts['base-camp-site'],2);assert.ok(state.notes.some(n=>n.id==='player-note'));
  assert.match(document.querySelector('aside').textContent,/Continue mission/);await reload();assertCampaignPresentation();assert.deepEqual(JSON.parse(localStorage.getItem(KEY)).settings,save.settings);assert.deepEqual(JSON.parse(localStorage.getItem(KEY)).learningRecords,save.learningRecords);

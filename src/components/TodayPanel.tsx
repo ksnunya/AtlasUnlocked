@@ -1,11 +1,12 @@
+import { academyRequirements } from "@/data/missionContent";
 import { missionHasStarted, missionStatusLabels } from "@/state/campaignState";
 import { AlertTriangle, Backpack, BookOpen, CalendarCheck, CheckSquare, School, TentTree } from "lucide-react";
 import { PanelModal } from "./PanelModal";
 import { useGameState } from "@/state/GameState";
 
 export function TodayPanel() {
-  const { selectedMission, missionRun, inventory, notes, setOverlay, setActiveView, startMission, setActiveNoteTab } = useGameState();
-  const academyRemaining = Object.values(missionRun.academyWork).filter((complete) => !complete).length;
+  const { selectedMission, missionRun, missionRuns, inventory, notes, setOverlay, setActiveView, startMission, setActiveNoteTab } = useGameState();
+  const academyRemaining = academyRequirements.filter(({ id }) => !missionRuns.northwind.academyWork[id]).length;
   const needed = inventory.filter((item) => item.category === "Physical" && selectedMission.supplyIds.includes(item.id) && (!item.available || !item.packed));
   const important = notes.filter((note) => note.important).slice(0, 3);
   const todos = notes.filter((note) => note.category === "To Do").slice(0, 4);

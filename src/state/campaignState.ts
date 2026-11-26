@@ -1,4 +1,4 @@
-import { initialInventory, initialMissions, initialNotes, type Mission, type InventoryItem, type FieldNote } from "@/data/gameData";
+import { initialInventory, initialMissions, type Mission, type InventoryItem, type FieldNote } from "@/data/gameData";
 import { initialMissionRun, type MissionRunState } from "@/data/missionContent";
 import { aslCheckpointComplete, campaignOrder, northwindRequirements, northwindRequiredTasks, suppliesReady } from "@/data/campaignContent";
 
@@ -35,7 +35,31 @@ export function selectCampaignMission(current: CampaignState, id: string): Campa
 export function unlockProgression(missions: Mission[]) {
   return missions.map((mission, index) => mission.state === "locked" && (index === 0 || missions[index - 1].state === "completed") ? { ...mission, state: "available" as const, nodeCode: "Available" } : mission);
 }
+// Remove only unchanged notes that older versions added automatically.
+const legacyNotebookExamples = [
+  ["Clues", "Relay tower northeast of river.", "northwind"],
+  ["Clues", "Storm damaged backup antenna.", "northwind"],
+  ["Numbers", "Generator output: 12 volts.", "northwind"],
+  ["Numbers", "Relay bearing: 038?.", "northwind"],
+  ["Places", "Northwind Field Research Station.", "northwind"],
+  ["Places", "Old weather lookout.", undefined],
+  ["Vocabulary", "Relay ? sends a signal onward.", "northwind"],
+  ["Vocabulary", "Bearing ? direction from a fixed point.", undefined],
+  ["To Do", "Find the damaged relay.", "northwind"],
+  ["To Do", "Check water before departure.", "northwind"],
+] as const;
+
+function isUnchangedNotebookExample(note: FieldNote) {
+  const match = /^note-([1-9]|10)$/.exec(note.id);
+  if (!match || note.important) return false;
+  const [category, text, missionId] = legacyNotebookExamples[Number(match[1]) - 1];
+  return note.category === category && note.text === text && note.missionId === missionId;
+}
+
 export function loadCampaign(saved: Partial<CampaignState> & { missionRun?: MissionRunState } | null): CampaignState {
+  const savedNotes = saved?.notes ?? [];
+  const notes = savedNotes.filter((note) => !isUnchangedNotebookExample(note));
+  const removedExamples = savedNotes.length - notes.length;
   let missions = initialMissions.map((base) => {
     const stored = saved?.missions?.find((mission) => mission.id === base.id);
     if (!stored) return { ...base, objectives: base.objectives.map((objective) => ({ ...objective })) };
@@ -46,7 +70,15 @@ export function loadCampaign(saved: Partial<CampaignState> & { missionRun?: Miss
   const missionRuns = Object.fromEntries(campaignOrder.map((id) => {
     // The old single run always belonged to Northwind, even when another map node was selected.
     const old = saved?.missionRuns?.[id] ?? (id === "northwind" ? saved?.missionRun : undefined);
-    return [id, { ...freshRun(), ...old, answers: { ...old?.answers }, attempts: { ...old?.attempts }, completedTasks: [...(old?.completedTasks ?? [])], academyWork: { ...initialMissionRun.academyWork, ...old?.academyWork } }];
+    const run = { ...freshRun(), ...old, answers: { ...old?.answers }, attempts: { ...old?.attempts }, completedTasks: [...(old?.completedTasks ?? [])], academyWork: { ...initialMissionRun.academyWork, ...old?.academyWork } };
+    if (removedExamples) {
+      if (!run.noteBaselineIds) run.noteBaseline = Math.max(0, run.noteBaseline - removedExamples);
+      if (!run.stationNoteBaselineIds && run.stationNoteBaseline > 0) {
+        run.stationNoteBaseline = Math.max(0, run.stationNoteBaseline - removedExamples);
+        run.stationNoteBaselineIds = notes.slice(0, run.stationNoteBaseline).map((note) => note.id);
+      }
+    }
+    return [id, run];
   }));
   // Older releases shared one run across routes. Rehome namespaced evidence,
   // including schema-2 saves that previously assigned that run to Northwind.
@@ -80,7 +112,7 @@ export function loadCampaign(saved: Partial<CampaignState> & { missionRun?: Miss
   inventory.push(...(saved?.inventory?.filter((item) => item.custom && !inventory.some((base) => base.id === item.id)) ?? []));
   const selectedMissionId = missions.some((mission) => mission.id === saved?.selectedMissionId && mission.state !== "locked") ? saved.selectedMissionId : (missions.find((mission) => mission.state === "active" || mission.state === "available") ?? missions[0]).id;
   return synchronizeCampaign({ missions, selectedMissionId, inventory,
-    notes: (saved?.notes ?? initialNotes).map((note, index) => ({ ...note, createdAt: note.createdAt ?? index + 1, important: note.important ?? false })),
+    notes: notes.map((note, index) => ({ ...note, createdAt: note.createdAt ?? index + 1, important: note.important ?? false })),
     missionRuns, lab: { relayPrepared: inventory.some((item) => item.id === "relay" && item.available), experimentCompleted: false, ...saved?.lab } });
 }
 export function updateRun(current: CampaignState, id: string, update: (run: MissionRunState) => MissionRunState): CampaignState {

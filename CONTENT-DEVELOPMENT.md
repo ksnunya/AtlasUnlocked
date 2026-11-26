@@ -165,11 +165,28 @@ Provide the transcript as readable text next to the clip. This template requires
 | Campaign saves | [GameState.tsx](src/state/GameState.tsx) and [campaignState.ts](src/state/campaignState.ts) | Browser `localStorage` uses the existing legacy key and schema 3 snapshot. `loadCampaign()` merges stored missions and objectives by IDs and restores runs, including legacy Northwind data. Keep IDs stable and test both new and existing saves. |
 | Answers and progression | `MissionRunState`, `recordAttempt()`, `completeObjective()`, `synchronizeCampaign()`, `completionBlocker()` | Runs store answers, attempt counts, completed task IDs, and position. Reordering tasks can change what a saved index points to. Plan an explicit migration when changing order or removing checkpoints. |
 | Inventory | `initialInventory`, `Mission.supplyIds`, `suppliesReady()`, [SupplyCheck.tsx](src/components/mission/SupplyCheck.tsx), [InventoryManagerPanel.tsx](src/components/InventoryManagerPanel.tsx) | The save loader merges base items by ID and retains custom items. Physical and in-game items are distinct. Updating defaults may not change a saved item's earlier values. |
-| Notebook | `FieldNote`, `addNote()`, `newMissionNote()`, [NotebookPanel.tsx](src/components/NotebookPanel.tsx) | Notes made while a mission is open can be tagged with its ID. A note gate checks for a new mission note against the run baseline. Preloaded notes and edits to an old note do not substitute for a new entry. |
+| Notebook | `FieldNote`, `addNote()`, `newMissionNote()`, [NotebookPanel.tsx](src/components/NotebookPanel.tsx) | Notes made while a mission is open can be tagged with its ID. A note gate checks for a new mission note against the run baseline. New players start with an empty Notebook. Editing an old note does not substitute for a new entry. |
 | Field Lab | `CampaignState.lab`, `prepareRelay()`, `runLabExperiment()`, [FieldLabPanel.tsx](src/components/FieldLabPanel.tsx) | The existing relay can be prepared after Northwind and must be packed for Glacier Relay. The existing experiment can add a Notebook observation. Additional experiments or craftable items need explicit state and rules. |
 | Review and reporting | [CompleteMissionPanel.tsx](src/components/CompleteMissionPanel.tsx), [ProgressPanel.tsx](src/components/ProgressPanel.tsx), [SkillsPanel.tsx](src/components/SkillsPanel.tsx) | The game displays expedition progress. Check any hard-coded display content separately when you add a subject. Attempt counts and completion are local gameplay evidence, not a standards grade or educator report. |
 
 Keep coursework reminders and instructional copy separate from save identifiers. If content must replace something already earned, decide which prior evidence is equivalent, preserve completion where appropriate, and add a legacy-save fixture. Use a separate browser profile for manual testing and avoid resetting anyone's existing progress.
+
+### Notebook practice examples
+
+These examples are instructional reference material. New players start with an empty Notebook and create their own entries during play.
+
+| Category | Example |
+| --- | --- |
+| Clues | Relay tower northeast of river. |
+| Clues | Storm damaged backup antenna. |
+| Numbers | Generator output: 12 volts. |
+| Numbers | Relay bearing: 038°. |
+| Places | Northwind Field Research Station. |
+| Places | Old weather lookout. |
+| Vocabulary | Relay — sends a signal onward. |
+| Vocabulary | Bearing — direction from a fixed point. |
+| To Do | Find the damaged relay. |
+| To Do | Check water before departure. |
 
 ## Build accessible activities
 

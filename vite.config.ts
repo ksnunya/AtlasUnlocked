@@ -21,6 +21,8 @@ export default defineConfig(() => ({
         }
       };
       emitDirectory(publicRoot);
+      const notices = path.resolve(import.meta.dirname, "THIRD-PARTY-NOTICES.txt");
+      this.emitFile({ type: "asset", fileName: "THIRD-PARTY-NOTICES.txt", source: readFileSync(notices) });
     },
   }],
   resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
