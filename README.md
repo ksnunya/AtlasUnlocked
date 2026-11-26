@@ -94,7 +94,7 @@ The DOM tests exercise all five missions through player controls. The 11 gamepla
 
 Clean installation on Node 24, a full manual browser playthrough, cross-browser save and reload behavior, desktop shortcut launch, and in-browser playback of all three clips remain release checks. Type checking and lint pass in the available environment, with existing Fast Refresh warnings. A Windows restriction can block the default Vite config loader, npm install hooks, and subprocess-based test runners.
 
-The npm advisory service was unreachable during release verification. The locked Vite development server should remain loopback-only, as configured. Upstream identifies a patch for [GHSA-p4f5-76q4-ffq7](https://github.com/vitejs/vite/security/advisories/GHSA-p4f5-76q4-ffq7), which applies when affected development servers are exposed to the network.
+The lockfile uses Vite 8.4.0. The game has one application page and a 404 fallback, so navigation no longer requires React Router. Zod, its unused form resolver, and the unused Tailwind Typography plugin were removed. Tailwind and PostCSS Nested both resolve postcss-selector-parser 6.1.6. The npm advisory service was unreachable after these changes, so an online audit of the current lockfile is still pending.
 
 ## Licensing
 
@@ -108,7 +108,7 @@ Third-party software notices are included in the [source](THIRD-PARTY-NOTICES.tx
 
 - [x] Adopt the owner-approved local-use license and document development credits.
 - [x] Record shipped software notices and map attribution.
-- [ ] Complete an online dependency audit and verify the Vite patch on Node 24.
+- [ ] Confirm the current lockfile with an online npm audit and a clean Node 24 installation.
 - [x] Record the owner's confirmation that the original mission videos were created for Atlas Unlocked with open-source assets.
 - [ ] Confirm participant consent and record asset-specific licenses and required credits for public GitHub and portfolio distribution.
 - [ ] Verify all five missions and the three videos in a supported browser from a clean checkout.
