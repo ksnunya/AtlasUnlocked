@@ -4,6 +4,29 @@ import { Crosshair, Layers3, LocateFixed, Minus, Plus, Wind } from "lucide-react
 import { MissionNode } from "./MissionNode";
 import { useGameState } from "@/state/GameState";
 
+// Match the OpenStreetMap center and scale in the archived expedition map.
+const mapCenter = { longitude: -21.93, latitude: 64.125 };
+const originalMapZoom = 9.8;
+const tileZoom = 11;
+const tileCount = 2 ** tileZoom;
+const tileSize = 512 * 2 ** originalMapZoom / tileCount;
+const centerTileX = (mapCenter.longitude + 180) / 360 * tileCount;
+const latitudeRadians = mapCenter.latitude * Math.PI / 180;
+const centerTileY = (1 - Math.asinh(Math.tan(latitudeRadians)) / Math.PI) / 2 * tileCount;
+const mapLeft = centerTileX - 500 / tileSize;
+const mapTop = centerTileY - 330 / tileSize;
+const mapTiles = [];
+
+for (let row = Math.floor(mapTop); row < mapTop + 660 / tileSize; row++) {
+  for (let column = Math.floor(mapLeft); column < mapLeft + 1000 / tileSize; column++) {
+    mapTiles.push({
+      href: `https://tile.openstreetmap.org/${tileZoom}/${column}/${row}.png`,
+      x: (column - mapLeft) * tileSize,
+      y: (row - mapTop) * tileSize,
+    });
+  }
+}
+
 export function MissionMap() {
   const { missions, selectedMission, selectMission, startMission, setOverlay } = useGameState();
   const [zoom, setZoom] = useState(1);
@@ -27,8 +50,11 @@ export function MissionMap() {
         <g fill="#183a34" opacity=".55">
           {Array.from({ length: 45 }).map((_, i) => <path key={i} d={`M${70 + (i * 83) % 800} ${210 + (i * 47) % 230}l8-18 8 18h-5l7 14H68l7-14Z`} />)}
         </g>
-        <rect width="1000" height="660" fill="url(#grid)"/>
         <rect width="1000" height="660" filter="url(#rough)" opacity=".18"/>
+        {mapTiles.map(({ href, x, y }) => (
+          <image key={href} href={href} x={x} y={y} width={tileSize} height={tileSize} />
+        ))}
+        <rect width="1000" height="660" fill="url(#grid)"/>
         <path d="M125 460C230 420 272 350 365 377S490 330 575 295s113-5 167-77 88-62 142-90" fill="none" stroke="#07181f" strokeOpacity=".75" strokeWidth="10" strokeLinecap="round" strokeDasharray="2 16"/>
         <path d="M125 460C230 420 272 350 365 377S490 330 575 295s113-5 167-77 88-62 142-90" fill="none" stroke="#6fe0f2" strokeWidth="4" strokeLinecap="round"/>
         <g fill="#bdeef5">{[0,1,2,3,4].map(i => <circle key={i} cx={265+i*115} cy={385-i*48} r="4" />)}</g>
@@ -52,6 +78,9 @@ export function MissionMap() {
       <MissionNode x="74%" y="28%" label="FIELD LAB" code="Return Anytime" state="lab" onClick={() => setOverlay("lab")} />
 
       <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded border border-white/15 bg-[#081b22]/85 px-3 py-2 text-[9px] uppercase tracking-wider text-white/60 backdrop-blur-sm"><Wind className="h-4 w-4 text-[#8cd9e4]" /><span>Wind: NW 18 km/h<br/><b className="text-white/80">Visibility: Good</b></span></div>
+      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" className="absolute bottom-0 right-0 z-20 bg-[#081b22] px-1 text-[9px] text-white underline">
+        ? OpenStreetMap contributors
+      </a>
       <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded border border-white/15 bg-[#081b22]/85 p-2 backdrop-blur-sm">
         <Crosshair className="h-5 w-5 text-[#e0bc6e]" /><div><p className="text-[8px] uppercase tracking-wider text-white/45">Map scale</p><p className="text-[10px] font-semibold text-white">1 square = 2 km</p></div><Layers3 className="ml-2 h-5 w-5 text-white/55" />
       </div>

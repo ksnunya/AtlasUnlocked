@@ -2,6 +2,8 @@
 
 Atlas Unlocked is a browser-based expedition game about route planning, field observations, and solving practical problems. Start at Base Camp, use the map to open your next mission, and keep your supplies and observations organized in the Inventory, Notebook, and Field Lab.
 
+**Developing educational content?** Start with the [Content Development Guide](CONTENT-DEVELOPMENT.md).
+
 ## Development status
 
 Atlas Unlocked is a playable work in progress and has not been fully tested. Future development includes character selection, mission improvements, and additional gameplay testing.
@@ -33,7 +35,7 @@ powershell -File .\src\windows\AtlasUnlockedLauncher.ps1 -Action Stop
 powershell -File .\src\windows\AtlasUnlockedLauncher.ps1 -Action Shortcut
 ```
 
-The Shortcut action creates an Atlas Unlocked desktop shortcut for this checkout. Keep using the same browser profile and `http://localhost:8080` to continue a save from before the rename. The game still reads and writes the original browser storage key.
+The Shortcut action creates an Atlas Unlocked desktop shortcut for this checkout. The Windows launcher opens the game in the installed Google Chrome using its normal profile. Keep using the same browser profile and `http://localhost:8080` to continue a save from before the rename. The game still reads and writes the original browser storage key.
 
 ## Play the campaign
 

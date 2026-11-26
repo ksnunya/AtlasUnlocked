@@ -69,15 +69,49 @@ function Test-Ready {
     } catch { return $false }
 }
 
-function Open-Game {
-    if (-not $NoBrowser) {
-        # ShellExecute uses the student's default browser, not a particular browser executable.
-        $browserStart = New-Object Diagnostics.ProcessStartInfo
-        $browserStart.FileName = $gameUrl
-        $browserStart.UseShellExecute = $true
-        $null = [Diagnostics.Process]::Start($browserStart)
-        Write-LauncherLog "Opened default browser: $gameUrl"
+function Find-Chrome {
+    $registrations = @(
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe',
+        'HKLM:\Software\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'
+    )
+    foreach ($registration in $registrations) {
+        $key = Get-Item -LiteralPath $registration -ErrorAction SilentlyContinue
+        if ($key) {
+            $candidate = $key.GetValue('')
+            if ($candidate -and (Test-Path -LiteralPath $candidate -PathType Leaf)) { return $candidate }
+        }
     }
+    foreach ($folder in @($env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:LOCALAPPDATA)) {
+        if (!$folder) { continue }
+        $candidate = Join-Path $folder 'Google\Chrome\Application\chrome.exe'
+        if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
+    }
+}
+
+function Open-Game {
+    if ($NoBrowser) { return }
+
+    # The launcher mutex serializes requests. Skip a second handoff from a rapid repeat click.
+    $stamp = Join-Path $runtimeFolder 'browser-request'
+    $lastRequest = Get-Item -LiteralPath $stamp -ErrorAction SilentlyContinue
+    if ($lastRequest) {
+        $elapsed = ([DateTime]::UtcNow - $lastRequest.LastWriteTimeUtc).TotalSeconds
+        if ($elapsed -ge 0 -and $elapsed -lt 4) {
+            Write-LauncherLog 'Skipped a repeat browser request.'
+            return
+        }
+    }
+
+    $chrome = Find-Chrome
+    if (!$chrome) { throw "Google Chrome could not be located. Open $gameUrl in Chrome." }
+
+    $browserStart = New-Object Diagnostics.ProcessStartInfo
+    $browserStart.FileName = $chrome
+    $browserStart.Arguments = $gameUrl
+    $browserStart.UseShellExecute = $true
+    $null = [Diagnostics.Process]::Start($browserStart)
+    Set-Content -LiteralPath $stamp -Value '' -Encoding ASCII
+    Write-LauncherLog "Requested Google Chrome to open $gameUrl"
 }
 
 function Start-ProductionServer {
@@ -146,6 +180,12 @@ try {
         }
         Save-ServerState $running
         Write-LauncherLog "Reusing game server PID $($running.ProcessId)."
+        Open-Game
+        exit 0
+    }
+    # Reopening a verified loopback game does not require process inspection.
+    if (Test-Ready) {
+        Write-LauncherLog 'Reusing the running Atlas Unlocked server.'
         Open-Game
         exit 0
     }
