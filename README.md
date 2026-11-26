@@ -88,7 +88,7 @@ npm run lint
 npm run build
 ```
 
-The DOM tests exercise the campaign through player controls. After building with all three local clips, set `ATLAS_UNLOCKED_CHROME` to a Chromium-based browser and `ATLAS_UNLOCKED_FFMPEG` to FFmpeg with libx264 support. Run `node scripts/verify-media.mjs` to verify actual video playback and build output.
+The DOM tests exercise all five missions through player controls. The 11 gameplay cases passed in an offline verification runner, including fresh starts and legacy saves. After building with all three local clips, set `ATLAS_UNLOCKED_CHROME` to a Chromium-based browser and `ATLAS_UNLOCKED_FFMPEG` to FFmpeg with libx264 support. Run `node scripts/verify-media.mjs` to verify actual video playback and build output.
 
 ### Outstanding testing
 
@@ -109,7 +109,8 @@ Third-party software notices are included in the [source](THIRD-PARTY-NOTICES.tx
 - [x] Adopt the owner-approved local-use license and document development credits.
 - [x] Record shipped software notices and map attribution.
 - [ ] Complete an online dependency audit and verify the Vite patch on Node 24.
-- [ ] Confirm signer consent and clear embedded graphics for public GitHub and portfolio distribution.
+- [x] Record the owner's confirmation that the original mission videos were created for Atlas Unlocked with open-source assets.
+- [ ] Confirm participant consent and record asset-specific licenses and required credits for public GitHub and portfolio distribution.
 - [ ] Verify all five missions and the three videos in a supported browser from a clean checkout.
 - [ ] Capture approved promotional screenshots from a fresh browser profile.
 - [ ] Obtain publication approval after the security and media rights checks are cleared.
