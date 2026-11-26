@@ -14,7 +14,7 @@ Atlas Unlocked is a custom coded game developed using source code, standard deve
 
 ## Run locally
 
-Clone the private repository with an authorized GitHub account or extract the source archive.
+Clone the repository (with an authorized GitHub account if private) or extract the source archive.
 
 Use Node.js 24.15 or later in the Node 24 series and npm. From the repository folder:
 
@@ -79,7 +79,7 @@ A clean install through the supported Node 24 setup, a full manual campaign play
 
 ## Licensing
 
-Copyright © 2026 Kela Small. The [draft local-use license](LICENSE) proposes free downloads, installation, and local play for personal use, noncommercial education, and portfolio evaluation. Commercial use, resale, redistribution, and distribution of modified versions require Kela Small’s prior written permission. The draft grants no permissions pending her approval.
+Copyright © 2026 Kela Small. The [local-use license](LICENSE) permits free downloads, installation, and local play for personal use, noncommercial education, and portfolio evaluation. Commercial use, resale, redistribution, and distribution of modified versions require Kela Small’s prior written permission.
 
 Kela Small’s three original video assets are separately copyrighted, with all rights reserved. Broader reuse requires her explicit permission. See [media credits](MEDIA-CREDITS.md) for asset details.
 
@@ -89,4 +89,5 @@ Kela Small’s three original video assets are separately copyrighted, with all 
 - [ ] Confirm signer consent and review the third-party graphics in the three owner-created clips before any public release.
 - [ ] Launch locally and complete all five missions. Verify keyboard and mouse controls, playback for all three clips, saved progress across reloads, and browser compatibility.
 - [ ] Capture the expedition map and Northwind encounter from the verified local build.
-- [ ] Obtain Kela Small’s approval of the proposed license and of publication. Review GitHub’s public repository terms, including its fork feature, before changing visibility.
+- [x] Obtain Kela Small’s approval of the license.
+- [ ] Obtain publication approval after media rights and repository security review.
