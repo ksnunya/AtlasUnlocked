@@ -1,0 +1,36 @@
+import { useState } from "react";
+import { BatteryCharging, BookOpen, Calculator, Check, Droplets, Package, PenLine, Pencil, Plus, Radio, Ruler, Trash2, Wrench, X } from "lucide-react";
+import { useGameState } from "@/state/GameState";
+import type { PhysicalCategory } from "@/data/gameData";
+
+const icons = { notebook: BookOpen, pencil: Pencil, pen: PenLine, ruler: Ruler, water: Droplets, calculator: Calculator, radio: Radio, toolkit: Wrench, battery: BatteryCharging, relay: Package };
+const categories: PhysicalCategory[] = ["Writing", "Measurement", "Science", "Personal", "School", "Mission Gear"];
+
+export function InventoryPanel({ expanded = false }: { expanded?: boolean }) {
+  const { inventory, selectedMission, togglePacked, updateInventoryItem, addInventoryItem, deleteInventoryItem, setOverlay } = useGameState();
+  const [tab, setTab] = useState<"Physical" | "In-Game">("Physical");
+  const [physicalFilter, setPhysicalFilter] = useState<"All" | PhysicalCategory>("All");
+  const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [form, setForm] = useState({ name: "", quantity: "1", physicalCategory: "School" as PhysicalCategory });
+  const visible = inventory.filter((item) => item.category === tab && (tab === "In-Game" || physicalFilter === "All" || item.physicalCategory === physicalFilter));
+  const packedCount = inventory.filter((item) => item.packed).length;
+  const add = () => { if (!form.name.trim()) return; addInventoryItem({ ...form, name: form.name.trim() }); setForm({ name: "", quantity: "1", physicalCategory: "School" }); setAdding(false); };
+
+  return <section className={`game-panel overflow-hidden ${expanded ? "min-h-[520px]" : ""}`}>
+    <div className="panel-heading"><span className="eyebrow">Inventory</span>{expanded ? <button type="button" onClick={() => { setTab("Physical"); setAdding(true); }} className="flex items-center gap-1 text-[9px] font-bold uppercase text-[#e0ba68]"><Plus className="h-3 w-3" /> Add item</button> : <button type="button" onClick={() => setOverlay("inventory")} className="text-[9px] font-bold uppercase text-[#72d8ea]">Manage · {packedCount}/{inventory.length}</button>}</div>
+    <div className="grid grid-cols-2 border-b border-white/10 bg-[#071820]">{(["Physical", "In-Game"] as const).map((type) => <button key={type} type="button" onClick={() => setTab(type)} className={`py-2 text-[9px] font-bold uppercase tracking-wider ${tab === type ? "bg-[#c99a3d]/10 text-[#e2bd6d]" : "text-white/40"}`}>{type === "Physical" ? "Physical supplies" : "In-game equipment"}</button>)}</div>
+    {expanded && tab === "Physical" && <div className="flex gap-1 overflow-x-auto border-b border-white/10 p-2">{(["All", ...categories] as const).map((category) => <button key={category} type="button" onClick={() => setPhysicalFilter(category)} className={`min-w-max rounded border px-2 py-1 text-[8px] font-bold uppercase ${physicalFilter === category ? "border-[#65d1e6]/40 bg-[#65d1e6]/10 text-[#75dbea]" : "border-white/10 text-white/35"}`}>{category}</button>)}</div>}
+    <div className={`${expanded ? "max-h-[58vh]" : "max-h-[300px] xl:max-h-[250px]"} overflow-y-auto p-2`}>
+      {adding && <div className="mb-2 grid gap-2 rounded-lg border border-[#c99a3d]/30 bg-[#c99a3d]/5 p-3 sm:grid-cols-[1fr_70px_140px_auto]"><input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Item name" className="mission-input" /><input value={form.quantity} onChange={(event) => setForm({ ...form, quantity: event.target.value })} aria-label="Quantity" className="mission-input" /><select value={form.physicalCategory} onChange={(event) => setForm({ ...form, physicalCategory: event.target.value as PhysicalCategory })} className="mission-input">{categories.map((category) => <option key={category}>{category}</option>)}</select><div className="flex gap-1"><button type="button" onClick={add} aria-label="Save item" className="mission-small"><Check className="h-3 w-3" /></button><button type="button" onClick={() => setAdding(false)} aria-label="Cancel" className="mission-small"><X className="h-3 w-3" /></button></div></div>}
+      <div className="space-y-1">{visible.map((item) => {
+        const Icon = icons[item.icon];
+        const required = selectedMission.supplyIds.includes(item.id);
+        return <div key={item.id} className={`rounded-md border px-2 py-2 ${required ? "border-[#c99a3d]/40 bg-[#c99a3d]/[.06]" : "border-white/[.07] bg-white/[.025]"}`}>
+          <div className="flex items-center gap-2"><div className={`grid h-8 w-8 shrink-0 place-items-center rounded border ${item.category === "Physical" ? "border-[#d6a64b]/35 text-[#e3bd68]" : "border-[#45c9e7]/35 text-[#70d9ef]"}`}><Icon className="h-4 w-4" /></div><div className="min-w-0 flex-1">{editing === item.id ? <div className="grid gap-1 sm:grid-cols-[1fr_130px]"><input value={item.name} onChange={(event) => updateInventoryItem(item.id, { name: event.target.value })} className="mission-input h-7 w-full py-1" />{item.category === "Physical" && <select value={item.physicalCategory} onChange={(event) => updateInventoryItem(item.id, { physicalCategory: event.target.value as PhysicalCategory })} className="mission-input h-7 py-1 text-[9px]">{categories.map((category) => <option key={category}>{category}</option>)}</select>}</div> : <p className="truncate text-[11px] font-semibold text-[#ebeee7]">{item.name} {required && <span className="text-[7px] uppercase text-[#e4bd69]">Required</span>}</p>}<p className="text-[8px] uppercase text-white/35">{item.physicalCategory ?? "Mission Gear"} · {item.optional ? "Optional" : "Essential"}</p></div>{expanded && <button type="button" onClick={() => setEditing(editing === item.id ? null : item.id)} className="text-[8px] uppercase text-white/45">{editing === item.id ? "Done" : "Edit"}</button>}{item.custom && expanded && !required && <button type="button" onClick={() => deleteInventoryItem(item.id)} aria-label={`Delete ${item.name}`} className="text-[#cf7968]"><Trash2 className="h-3.5 w-3.5" /></button>}</div>
+          <div className="mt-2 grid grid-cols-[1fr_1fr_auto] gap-1"><button type="button" onClick={() => updateInventoryItem(item.id, { available: !item.available, packed: item.available ? false : item.packed })} className={`rounded border px-2 py-1 text-[8px] font-bold uppercase ${item.available ? "border-[#54c485]/30 text-[#6bd79a]" : "border-[#d59b54]/30 text-[#dda75c]"}`}>{item.available ? "Available at home" : "Missing"}</button><button type="button" onClick={() => togglePacked(item.id)} disabled={!item.available || !(Number.parseFloat(item.quantity) > 0)} className={`rounded border px-2 py-1 text-[8px] font-bold uppercase disabled:opacity-30 ${item.packed ? "border-[#5acb8d]/30 text-[#6fd99d]" : "border-white/10 text-white/40"}`}>{item.packed ? "Packed" : "Not packed"}</button>{expanded ? <input value={item.quantity} onChange={(event) => updateInventoryItem(item.id, { quantity: event.target.value })} aria-label={`${item.name} quantity`} className="w-14 rounded border border-white/10 bg-black/15 px-1 text-center text-[9px] text-white" /> : <span className="rounded bg-black/20 px-2 py-1 text-[9px] text-white/65">× {item.quantity}</span>}</div>
+        </div>;
+      })}</div>
+    </div>
+  </section>;
+}

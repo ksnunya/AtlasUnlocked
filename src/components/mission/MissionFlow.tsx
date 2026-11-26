@@ -1,0 +1,34 @@
+import { ArrowLeft, Backpack, BookOpen, Check, Map, RadioTower, X } from "lucide-react";
+import { useState } from "react";
+import { useGameState } from "@/state/GameState";
+import type { MissionStage } from "@/data/missionContent";
+import { NotebookPanel } from "@/components/NotebookPanel";
+import { AcademyWork } from "./AcademyWork";
+import { AslClueTask } from "./AslClueTask";
+import { FieldRoute } from "./FieldRoute";
+import { MathTask } from "./MathTask";
+import { MissionIntro } from "./MissionIntro";
+import { ReadingTask } from "./ReadingTask";
+import { ScienceTask } from "./ScienceTask";
+import { CampaignRoute } from "./CampaignRoute";
+import { SupplyCheck } from "./SupplyCheck";
+
+const labels: Record<MissionStage, string> = { intro: "Mission Brief", supplies: "Supply Check", academy: "Academy Work", route: "Field Route", trailhead: "Trailhead", asl: "ASL Clue", cache: "Equipment Cache", station: "Research Station", summary: "Mission Summary", objectives: "Mission Route" };
+const backStage: Partial<Record<MissionStage, MissionStage>> = { supplies: "intro", academy: "supplies", route: "academy", trailhead: "route", asl: "trailhead", cache: "asl", station: "cache", summary: "station", objectives: "route" };
+
+export function MissionFlow() {
+  const { missionRun, selectedMission, closeMission, setMissionStage, setOverlay } = useGameState();
+  const [notebookOpen, setNotebookOpen] = useState(false);
+  if (!missionRun.open) return null;
+  const routeStops = selectedMission.id === "northwind" ? ["Trailhead", "Equipment Cache", "Research Station"] : selectedMission.objectives.map((objective) => objective.text);
+  const routeIndex = selectedMission.id !== "northwind" ? (missionRun.stage === "objectives" ? missionRun.objectiveIndex ?? 0 : missionRun.stage === "summary" ? routeStops.length : -1) : missionRun.stage === "trailhead" || missionRun.stage === "asl" ? 0 : missionRun.stage === "cache" ? 1 : missionRun.stage === "station" || missionRun.stage === "summary" ? 2 : -1;
+  return <div className="fixed inset-0 z-40 flex flex-col bg-[#06141a] text-[#edf0e8]">
+    <header className="flex min-h-16 flex-wrap items-center gap-3 border-b border-[#c99a3d]/45 bg-[#071b23] px-3 sm:px-5"><div className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#c99a3d]/50 bg-[#13363a]"><RadioTower className="h-5 w-5 text-[#e2ba65]" /></div><div className="min-w-0 flex-1"><p className="text-[8px] font-bold uppercase tracking-[.2em] text-[#6ed6e8]">Mission in progress · Autosaved locally</p><h1 className="truncate font-display text-base text-[#f0d99d] sm:text-lg">{selectedMission.title}</h1></div><button type="button" onClick={() => setOverlay("hints")} className="mission-secondary hidden sm:block">Hints</button><button type="button" onClick={() => setOverlay("lab")} className="mission-secondary">Field Lab</button><button type="button" onClick={() => setOverlay("inventory")} className="mission-secondary flex items-center gap-1 px-2"><Backpack className="h-4 w-4" /><span className="hidden sm:inline">Inventory</span></button><button type="button" onClick={() => setNotebookOpen(true)} className="mission-secondary flex items-center gap-1"><BookOpen className="h-4 w-4" /> Notebook</button><button type="button" onClick={closeMission} aria-label="Save and return to map" title="Save and return to map" className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-white/60 hover:bg-white/10"><X className="h-4 w-4" /></button></header>
+    <div className="border-b border-white/10 bg-[#0a222a] px-3 py-2"><div className="mx-auto flex max-w-4xl items-center overflow-x-auto justify-center gap-1">{routeStops.map((stop, index) => <div key={stop} className={`flex items-center gap-1 text-[8px] font-bold uppercase tracking-wider ${index <= routeIndex ? "text-[#71d9eb]" : "text-white/25"}`}>{index < routeIndex ? <Check className="h-3 w-3" /> : <span className="grid h-4 w-4 place-items-center rounded-full border border-current">{index + 1}</span>}<span className="hidden sm:inline">{stop}</span>{index < routeStops.length - 1 && <span className="mx-2 h-px w-8 bg-current sm:w-20" />}</div>)}</div></div>
+    <main className="flex-1 overflow-y-auto p-3 sm:p-5"><section className="mission-workspace mx-auto max-w-4xl"><div className="mb-4 flex items-center justify-between border-b border-[#c99a3d]/25 pb-3"><div>{backStage[missionRun.stage] && <button type="button" onClick={() => setMissionStage(selectedMission.id !== "northwind" && missionRun.stage === "summary" ? "objectives" : selectedMission.id !== "northwind" && missionRun.stage === "route" ? "supplies" : backStage[missionRun.stage]!)} className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-white/45 hover:text-white"><ArrowLeft className="h-3.5 w-3.5" /> Back</button>}</div><span className="text-[9px] font-bold uppercase tracking-[.16em] text-[#d9b362]">{labels[missionRun.stage]}</span></div>
+      {missionRun.stage === "objectives" && <CampaignRoute key={`${selectedMission.id}-${missionRun.objectiveIndex ?? 0}`} />}{missionRun.stage === "intro" && <MissionIntro />}{missionRun.stage === "supplies" && <SupplyCheck />}{missionRun.stage === "academy" && <AcademyWork />}{missionRun.stage === "route" && <FieldRoute />}{missionRun.stage === "trailhead" && <ReadingTask />}{missionRun.stage === "asl" && <AslClueTask />}{missionRun.stage === "cache" && <MathTask />}{missionRun.stage === "station" && <ScienceTask />}{missionRun.stage === "summary" && <div className="py-8 text-center"><Check className="mx-auto h-10 w-10 text-[#69d59b]" /><h2 className="mt-3 font-display text-2xl text-[#f0d99d]">All field checkpoints complete</h2><p className="mt-2 text-xs text-white/55">Review the expedition record, then finish the mission to unlock the next route and return to the map.</p><button type="button" onClick={() => setOverlay("complete")} className="mission-primary mt-5 px-10">Open mission review</button></div>}
+    </section></main>
+    <footer className="flex items-center justify-between border-t border-white/10 bg-[#071820] px-4 py-2 text-[9px] text-white/35"><span className="flex items-center gap-1"><Map className="h-3 w-3" /> Progress stays on this device</span><button type="button" onClick={closeMission} className="hover:text-white">Save & return to map</button></footer>
+    {notebookOpen && <div className="fixed inset-0 z-40 bg-black/55" onMouseDown={() => setNotebookOpen(false)}><div className="absolute inset-y-2 right-2 w-[min(440px,calc(100%-16px))]" onMouseDown={(event) => event.stopPropagation()}><button type="button" onClick={() => setNotebookOpen(false)} aria-label="Close notebook" className="absolute right-2 top-1 z-10 grid h-8 w-8 place-items-center rounded-full text-[#4b4537] hover:bg-black/10"><X className="h-4 w-4" /></button><NotebookPanel expanded /></div></div>}
+  </div>;
+}

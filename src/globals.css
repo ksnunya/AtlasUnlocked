@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 194 59% 6%;
+    --foreground: 60 19% 92%;
+    --card: 193 46% 10%;
+    --card-foreground: 60 19% 92%;
+    --popover: 193 46% 10%;
+    --popover-foreground: 60 19% 92%;
+    --primary: 40 55% 51%;
+    --primary-foreground: 194 45% 10%;
+    --secondary: 187 31% 17%;
+    --secondary-foreground: 60 19% 92%;
+    --muted: 190 22% 18%;
+    --muted-foreground: 165 11% 67%;
+    --accent: 189 71% 48%;
+    --accent-foreground: 194 59% 6%;
+    --destructive: 8 64% 48%;
+    --destructive-foreground: 60 19% 92%;
+    --border: 41 32% 35%;
+    --input: 190 22% 20%;
+    --ring: 40 55% 51%;
+    --radius: 0.65rem;
+  }
+
+  * { @apply border-border; }
+  html { background: #06141a; }
+  body { @apply bg-background text-foreground; margin: 0; min-width: 320px; min-height: 100vh; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  button { font: inherit; }
+}
+
+@layer components {
+  .font-display { font-family: Georgia, Cambria, "Times New Roman", serif; letter-spacing: .025em; }
+
+  .expedition-shell {
+    background-color: #06141a;
+    background-image:
+      radial-gradient(circle at 18% 10%, rgba(48, 102, 94, .2), transparent 28%),
+      repeating-radial-gradient(ellipse at 80% 15%, transparent 0 24px, rgba(211, 180, 109, .025) 25px 26px);
+  }
+
+  .game-panel {
+    border: 1px solid rgba(201, 154, 61, .5);
+    border-radius: .6rem;
+    background:
+      linear-gradient(rgba(8, 27, 34, .97), rgba(8, 25, 31, .97)),
+      repeating-radial-gradient(ellipse at 20% 0, transparent 0 18px, rgba(229, 196, 118, .05) 19px 20px);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .035), 0 8px 22px rgba(0, 0, 0, .28);
+  }
+
+  .panel-heading {
+    display: flex;
+    height: 38px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(201, 154, 61, .36);
+    padding: 0 14px;
+    background: linear-gradient(90deg, rgba(201, 154, 61, .11), transparent 75%);
+  }
+
+  .eyebrow { font-family: Georgia, Cambria, serif; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #f2d694; }
+
+  .mission-detail { display: grid; grid-template-columns: 18px 1fr; align-items: start; gap: 8px; color: #cbd6d0; }
+  .mission-detail svg { width: 15px; height: 15px; color: #d8af5a; margin-top: 1px; }
+  .mission-detail b { display: block; font-size: 9px; color: rgba(255,255,255,.48); text-transform: uppercase; letter-spacing: .08em; }
+
+  .station-art {
+    background:
+      linear-gradient(to top, rgba(5,22,27,.4), transparent 65%),
+      radial-gradient(circle at 75% 25%, rgba(232,189,99,.5) 0 2%, transparent 20%),
+      linear-gradient(150deg, #273d3c 0 43%, #4f5f50 44% 55%, #273b3a 56% 100%);
+  }
+  .station-art:before, .station-art:after { content: ""; position: absolute; bottom: 22px; width: 0; height: 0; border-left: 70px solid transparent; border-right: 70px solid transparent; border-bottom: 80px solid #192d2d; }
+  .station-art:before { left: -25px; }
+  .station-art:after { right: -30px; border-left-width: 90px; border-right-width: 90px; border-bottom-color: #203633; }
+
+  .journal-page {
+    background-color: #e9dfc4;
+    background-image: repeating-linear-gradient(transparent 0 24px, rgba(75, 105, 121, .18) 25px);
+    box-shadow: inset 5px 0 12px rgba(82,66,35,.12), inset -5px 0 12px rgba(82,66,35,.09);
+  }
+
+  .mission-map:after { content: ""; pointer-events: none; position: absolute; inset: 0; box-shadow: inset 0 0 55px rgba(3, 14, 17, .72); }
+
+  .mission-workspace { border: 1px solid rgba(201,154,61,.4); border-radius: .75rem; background: rgba(8,27,34,.97); padding: 1rem; box-shadow: 0 18px 50px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.025); }
+  .mission-primary { @apply rounded-md border border-[#e4bf6a]/60 bg-[#c99a3d] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[.1em] text-[#10232a] transition hover:bg-[#ddb65e]; }
+  .mission-secondary { @apply rounded-md border border-white/15 bg-white/[.035] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[.08em] text-white/65 transition hover:bg-white/[.08] hover:text-white; }
+  .mission-small { @apply rounded border border-[#c99a3d]/40 bg-[#c99a3d]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-[#e4bf6d] hover:bg-[#c99a3d]/20; }
+  .mission-input { @apply min-w-0 rounded border border-white/15 bg-[#071a21] px-3 py-2 text-xs text-white outline-none focus:border-[#64d2e7]; }
+  .mission-input option { background: #071a21; color: white; }
+  .mission-info { @apply rounded-lg border border-white/10 bg-white/[.025] p-4; }
+  .mission-info h3 { @apply mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#dfba68]; }
+  .mission-info h3 svg { @apply h-4 w-4; }
+  .mission-info p { @apply mb-1 text-[11px] leading-relaxed text-white/55; }
+  .task-card { @apply rounded-lg border border-white/10 bg-white/[.025] p-4; }
+  .task-card > svg { @apply mb-2 h-5 w-5 text-[#dfb964]; }
+  .task-card h3 { @apply mb-2 text-xs font-bold uppercase tracking-wider text-[#eee5cf]; }
+  .task-card > p { @apply text-[11px] leading-relaxed text-white/55; }
+}
+
+@media (max-width: 1279px) {
+  .map-layout { grid-template-columns: 290px minmax(450px, 1fr); }
+  .map-layout > :nth-child(3) { grid-column: 1 / -1; }
+}
+
+@media (max-width: 767px) {
+  .map-layout { grid-template-columns: minmax(0, 1fr); }
+  .map-layout > :nth-child(3) { grid-column: auto; grid-template-columns: minmax(0, 1fr); }
+  .mission-map { min-height: 520px; }
+  .panel-heading { padding-inline: 10px; }
+  .eyebrow { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mission-map { animation: map-reveal .55s ease-out both; }
+  .game-panel { animation: panel-rise .45s ease-out both; }
+  @keyframes map-reveal { from { opacity: 0; transform: scale(.99); } to { opacity: 1; transform: scale(1); } }
+  @keyframes panel-rise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+}
