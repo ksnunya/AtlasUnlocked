@@ -1,23 +1,26 @@
 Atlas Unlocked Local Use License
 
-DRAFT FOR OWNER APPROVAL
-This draft grants no permissions until Kela Small approves and adopts it.
+Adopted November 26, 2026.
 
 Copyright (c) 2026 Kela Small. All rights reserved except as expressly granted
-by the adopted license.
+by this license.
 
 1. Permitted use
    Kela Small grants you permission, at no charge, to download, install,
    and run Atlas Unlocked on a computer you control for personal use,
    noncommercial educational use, or portfolio evaluation. You may make
    the local copies necessary for those purposes. Retain the copyright
-   and license notices in those copies.
+   and license notices in those copies. You may customize educational content
+   locally for the permitted purposes, but may not distribute modified copies
+   except as otherwise permitted by applicable third-party terms.
 
 2. Reserved rights
    All other rights are reserved. Commercial use, resale, redistribution,
    public hosting, sublicensing, and distribution of modified versions
    require Kela Small's prior written permission. Public visibility of the
    source code does not grant additional rights under this license.
+   Viewing and forking on GitHub are permitted to the extent provided by
+   GitHub's applicable terms of service.
 
 3. Media and third-party material
    Kela Small retains copyright in her original video assets. Permission
@@ -26,3 +29,8 @@ by the adopted license.
    Third-party material remains subject to its own licenses. These terms
    do not limit rights granted under those separate licenses. See
    MEDIA-CREDITS.md for video attribution and rights information.
+
+4. Disclaimer
+   The game is a work in progress provided AS IS, without warranties of any
+   kind, express or implied, to the extent permitted by applicable law.
+   Use is at your own risk.
