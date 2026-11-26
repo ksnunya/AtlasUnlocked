@@ -6,6 +6,10 @@ Atlas Unlocked is a browser-based expedition game about route planning, field ob
 
 Atlas Unlocked is a playable work in progress and has not been fully tested. Future development includes character selection, mission improvements, and additional gameplay testing.
 
+## Development and Technology
+
+Atlas Unlocked is a custom coded game developed using source code, standard development tools, and AI assisted coding. It was not created using Base44 or similar no code app building platforms. The project maintains its own source code, assets, gameplay systems, and build configuration.
+
 ## Run locally
 
 Clone the private repository with an authorized GitHub account or extract the source archive.
