@@ -10,7 +10,7 @@ Atlas Unlocked is a playable work in progress and has not been fully tested. Fut
 
 ## Development and Technology
 
-Atlas Unlocked is a custom coded game developed using source code, standard development tools, and AI assisted coding. It was not created using Base44 or similar no code app building platforms. The project maintains its own source code, assets, gameplay systems, and build configuration.
+Atlas Unlocked is a custom coded game developed using standard development tools and AI assisted coding, primarily through ChatGPT and Codex, with limited use of Dyad during development. The game runs independently without requiring Dyad, Base44, or a proprietary app building platform. The project maintains its own source code, assets, gameplay systems, and build configuration.
 
 ## Run locally
 
